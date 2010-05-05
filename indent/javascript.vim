@@ -102,7 +102,7 @@ endfunction
 " ===========
 function! GetJsIndent(lnum)
 	" Grab the first non-comment line prior to this line
-	let pnum = GetNonCommentLine(a:lnum-1)
+	let pnum = s:GetNonCommentLine(a:lnum-1)
 
 	" First line, start at indent = 0
 	if pnum == 0
@@ -111,7 +111,7 @@ function! GetJsIndent(lnum)
 	endif
 
 	" Grab the second non-comment line prior to this line
-	let ppnum = GetNonCommentLine(pnum-1)
+	let ppnum = s:GetNonCommentLine(pnum-1)
 
 	echo "Line: " . a:lnum
 	echo "PLine: " . pnum

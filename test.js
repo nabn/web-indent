@@ -2,6 +2,7 @@
 // Sample Javascript test code
 //
 //
+/
 
 // = Case: Arithmetic (1)
 var x = 1 + 1; 	// 0
@@ -17,6 +18,7 @@ var x = 1 + 	// 0
 
 // = Case: Object (1)
 var x = { 		// 0
+	// comment 	// 1
 	y : y, 	// 1
 	z : z		// 1
 } 			// 0
@@ -58,6 +60,15 @@ function $blah( 	// 0
 	z ) { 	// 1
 } 			// 0
 
+// Case: Function (5)
+function $blah( 	// 0 
+	x, 		// 1
+	y, 		// 1
+	z ) { 	// 1
+	x; 		// 1
+} 			// 0
+
+
 
 // = Case: if (1)
 if ( x ) { 	// 0
@@ -81,6 +92,15 @@ if( x == y && 	// 0
 	z == w) { 	// 1
 	x; 		// 1
 } 			// 0
+
+// = Case: if (4a)
+if( x == y && 	// 0
+	y == z || 	// 1
+	z == w)  	// 1
+{ 			// 0
+	x; 		// 1
+} 			// 0
+
 
 // = Case: if (5)
 if(x) 		// 0
@@ -240,3 +260,37 @@ catch(e) 		// 0
 finally  		// 1
 	// comment 	// 1
 	z; 		// 1
+
+// = Case: Anonymous Function (1)
+(function(x) { 	// 0
+	x; 		// 1
+	y; 		// 1
+})(x); 		// 0
+
+// = Case: Anonymous Function (2)
+(function(x)  	// 0
+{ 			// 0
+	x; 		// 1
+	y; 		// 1
+})(x); 		// 0
+
+// = Case: Anonymous Function (2)
+(function(x)  	// 0
+{ 			// 1
+	x;  		// 1
+	y; 		// 1
+} 			// 0
+)(x); 		// 0
+
+// = Case: Anonymous Function (1)
+(function(x) { 	// 0
+	x; 		// 1
+	y; 		// 1
+} 			// 0
+)(x); 		// 0
+
+// = Case: Anonymous Function (2)
+(function(x) { 	// 0
+	x; 		// 1
+	y; 		// 1
+})(x); 		// 0
