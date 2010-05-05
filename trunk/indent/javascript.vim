@@ -52,7 +52,7 @@ let s:js_m_switch_beg = s:js_s_switch_beg . '\s*{\s*'
 let s:js_switch_mid = '\(case.*\|default\)\s*:\s*'
 
 " Single line comment (// xxx)
-let s:syn_comment = '\<javaScript\(Doc\|Line\)\=Comment\>'
+let s:syn_comment = 'Comment'
 
 
 " 2. Aux. Functions
