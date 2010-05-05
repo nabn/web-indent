@@ -2,7 +2,7 @@
 // Sample Javascript test code
 //
 //
-/
+
 
 // = Case: Arithmetic (1)
 var x = 1 + 1; 	// 0
@@ -15,6 +15,10 @@ var x = 1 + 	// 0
 var x = 1 + 	// 0
 1 +  		// 1
 1; 		// 1
+
+// = Case: Object (2) 
+var x = { y : y, z : z } 	// 0
+w; 					// 0
 
 // = Case: Object (1)
 var x = { 		// 0
@@ -172,7 +176,6 @@ for (var i = 0; i < blah.length; i++) { 	// 0
 // = Case: for (2)
 for (var i = 0; i < blah.length; i++) 	// 0
 	blah[i]; 					// 1
-
 x; 							// 0
 
 // = Case: switch 
@@ -191,43 +194,43 @@ default: 		// 0
 } 		
 
 // = Case: try (1)
-try {
-	x;
-}
+try { 		// 0
+	x; 		// 1
+} 			// 0
 
-// = case: try (2)
-try 
-	x;
-y;
+// = Case: try (2)
+try 			// 0
+	x; 		// 1 
+y; 			// 0 
 
 // = Case: try (3)
-try 
-{
-	x;
-}
+try  			// 0
+{ 			// 0
+	x; 		// 1
+} 			// 0
 
 // = Case: try catch (1)
-try {
-	x;
-} catch(e) {
-	y;
-}
+try { 		// 0 
+	x; 		// 1 
+} catch(e) {  	// 0
+	y; 		// 1
+} 			// 0
 
-// case: try catch (2)
-try 
-{
-	x;
-} 
-catch(e)
-{
-	y;
-}
+// Case: try catch (2)
+try  			// 0
+{ 			// 0
+	x; 		// 1
+} 			// 0
+catch(e) 		// 0
+{ 			// 0
+	y; 		// 1 
+} 			// 0
 
 // Case: try catch (3)
-try 
-	x;
-catch(e)
-	y;
+try  			// 0
+	x; 		// 1
+catch(e) 		// 0 
+	y; 		// 1
 
 
 // Case: try catch finally (1)
@@ -289,8 +292,121 @@ finally  		// 1
 } 			// 0
 )(x); 		// 0
 
-// = Case: Anonymous Function (2)
-(function(x) { 	// 0
-	x; 		// 1
-	y; 		// 1
-})(x); 		// 0
+// = Case: Multi Line Invocation (1)
+$(document).bind('click', function() { 	// 0
+}); 						 	// 0
+
+// = Case: Multi Line Invocation (2)
+$(document).bind('click', function() { 	// 0
+	x; 						// 1
+	y; 						// 1
+}); 							// 0
+
+
+// = Case: COMPLEX
+(function(window, undefined) { 				// 0
+	// = Class: Test 						// 1
+	// 								// 1
+	// = Description: This is a  				// 1
+	//   test class. 						// 1
+	// 								// 1
+	var Test = new Class({  				// 1
+		initialize: function() { 			// 2
+			this.test = test; 			// 3
+		},   							// 2
+
+		// = Method: test 				// 2
+		//  							// 2
+		// = Description:  				// 2
+		// 							// 2
+		test: function(blah) { 				// 2
+			if(blah) { 					// 3
+				return "blah"; 			// 4
+			} else if(blah === undefined) 	// 3
+				return "blahblah"; 		// 4
+			else { 					// 3
+				// another comment. 		// 4
+				return "blahblahblah"; 		// 4
+			} 						// 3
+
+			var x = { 					// 3
+				y: function() { 			// 4
+					for (var i = 0; i < blah.length; i++) { 	// 5
+						blah[i]; 		// 6
+					}; 				// 5
+				} 					// 4
+			}; 						// 3
+
+			return new function() { 		// 3
+			}; 						// 3
+		}, 							// 2
+
+		// = Method: blah 				// 2
+		//  							// 2
+		// = Description: description 		// 2
+		// 							// 2
+		blah: function(haha) { 				// 2 
+			return this.test; 			// 3
+		} 							// 2
+	}); 								// 1
+})(this); 								// 0
+
+
+// Case: SKELETON CODE
+(function(window, undefined) { 				// 0
+	var Skeleton = new Class({ 				// 1
+	}); 								// 1
+
+	var Skeleton2 = new Class({ 				// 1
+		Extends: Skeleton 				// 2
+	}); 								// 1
+
+	var Skeleton3 = new Class({ 				// 1
+		skeleton: function() {  			// 2
+		}, 							// 2
+
+		objects: function() { 				// 2
+			var x, y; 					// 3
+
+			x = {}; 					// 3
+			y = []; 					// 3 
+
+			x = { 					// 3
+			}; 						// 3
+
+			y =  [ 					// 3
+			]; 						// 3
+
+		}, 							// 2
+
+		contrls: function() { 				// 2
+			while(true) { 				// 3
+			} 						// 3
+
+			do { 						// 3
+			} while(true); 				// 3
+
+			with(x) { 					// 3
+			} 						// 3
+
+			if (true) { 				// 3
+			} else if(true) { 			// 3
+			} else { 					// 3
+			} 						// 3 
+
+			for (var i = 0; i < blah.length; i++) { 	// 3
+			} 							// 3
+
+			switch(true) { 				// 3
+			case 'case1': break; 			// 3
+			case 'case2': break; 			// 3
+			default: 					// 3
+			} 						// 3
+
+			try { 					// 3
+			} catch (e) { 				// 3
+			} finally { 				// 3
+			} 						// 3
+		} 							// 2
+	}); 								// 1
+})(this); 								// 0
