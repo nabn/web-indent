@@ -4,10 +4,10 @@
 " URL:
 " Last Change: 	April 30, 2010
 
-"if exists('b:did_indent')
-  "finish
-"endif
-"let b:did_indent = 1
+if exists('b:did_indent')
+  finish
+endif
+let b:did_indent = 1
 
 setlocal indentexpr=GetJsIndent(v:lnum)
 setlocal indentkeys=0{,0},0),:,!^F,o,O,e,*<Return>,=*/
@@ -274,9 +274,8 @@ function! GetJsIndent(lnum)
 	endif
 
 
-	" Multi Line Cntrl Blocks
-	"
-	"
+	" Handle: Multi Line Cntrl Blocks
+	" ===============================
 	if pline =~ s:js_m_cntrl_beg . s:js_line_comment . '$'
 		echo "Pline matched multi line control beg"
 		if line =~ s:js_m_cntrl_mid . s:js_line_comment . '$' || line =~ s:js_m_cntrl_end . s:js_line_comment . '$'
@@ -315,9 +314,8 @@ function! GetJsIndent(lnum)
 		return ind - &sw
 	endif
 
-	" Basic Objects
-	"
-	"
+	" Handle: Basic Objects
+	" =====================
 	if pline =~ s:js_object_beg . s:js_line_comment . '$'
 		echo "PLine matched object beginning"
 		if line =~ s:js_object_end . s:js_line_comment . '$'
