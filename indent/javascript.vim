@@ -4,6 +4,9 @@
 " URL:
 " Last Change: 	April 30, 2010
 
+" 0. Standard Stuff
+" =================
+
 " Only load one indent script per buffer
 "if exists('b:did_indent')
   "finish
@@ -16,8 +19,7 @@ if !exists("g:js_indent_log")
 endif
 
 setlocal indentexpr=GetJsIndent(v:lnum)
-setlocal indentkeys=0{,0},0),:,!^F,o,O,e,*<Return>,=*/
-
+setlocal indentkeys=0{,0},o,O,e,!<Tab>,*<Return>
 
 " 1. Variables
 " ============
@@ -29,13 +31,6 @@ let s:js_line_comment = '\s*\(//.*\)*'
 " Simple Objects
 let s:js_object_beg = '[{\[]\s*'
 let s:js_object_end = '^[^][{}]*[}\]][;,]\=\s*'
-
-" Immediately Executed Anonymous Function
-let s:js_s_anon_beg = '(\s*function\s*(.*)\s*'
-let s:js_s_anon_end = ')(.*)[;,]\s*'
-
-let s:js_m_anon_beg = s:js_s_anon_beg . '\s*{\s*'
-let s:js_m_anon_end = '\s*}\s*' . s:js_s_anon_end
 
 " Simple control blocks (those not beginngin with "{")
 let s:js_s_cntrl_beg = '\(\(\(if\|for\|with\|while\)\s*(.*)\)\|\(try\|do\)\)\s*' 		
@@ -58,12 +53,10 @@ let s:js_multi_invok_end = s:js_s_multi_end . '[;,]\{1}\s*'
 " Special switch control
 let s:js_s_switch_beg = 'switch\s*(.*)\s*' "Actually not allowed. 
 let s:js_m_switch_beg = s:js_s_switch_beg . '\s*{\s*'
-
 let s:js_switch_mid = '^.*\(case.*\|default\)\s*:\s*'
 
 " Single line comment (// xxx)
-let s:syn_comment = 'Comment'
-
+let s:syn_comment = '\(Comment\|String\)'
 
 " 2. Aux. Functions
 " =================
@@ -93,7 +86,7 @@ endfunction
 " Determines whether the specified position is contained in a comment. "Note:
 " This depends on a 
 function! s:IsInComment(lnum, cnum) 
-	return synIDattr(synID(a:lnum, a:cnum, 1), 'name') =~ s:syn_comment
+	return synIDattr(synID(a:lnum, a:cnum, 1), 'name') =~? s:syn_comment
 endfunction
 
 
@@ -106,7 +99,7 @@ function! s:IsComment(lnum)
 
 	return s:IsInComment(a:lnum, 1) && s:IsInComment(a:lnum, strlen(line)) "Doesn't absolutely work.  Only Probably!
 endfunction
- 
+
 
 
 " = Method: Log
@@ -146,9 +139,6 @@ function! GetJsIndent(lnum)
 
 	" Determine the current level of indentation
 	let ind = indent(pnum)
-
-	"call s:Log(synIDattr(synID(line("."), col("."), 0), 'name'))
-
 
 	" Handle: Mutli-Line Block Invocation/Function Declaration
 	" ========================================================
@@ -273,15 +263,29 @@ function! GetJsIndent(lnum)
 
 	" Handle: {}
 	" ==========
-	if line =~ '^[^{]*}'
+	if line =~ '^[^{]*}' && !s:IsComment(a:lnum) && line !~ '"[^}]*}[^}]*"'
 		call s:Log("Line matched closing bracket")
 
-		let mnum = searchpair('{', '', '}', 'bW')
+		" Save the cursor position.
+		let curpos = getpos(".")
+
+		" Set the cursor position to the beginning of the line (default
+		" behavior when using ==)
+		call setpos(".", [0, a:lnum, 1, 0])
+
+		" Search for the opening tag
+		let mnum = searchpair('{', '', '}', 'bW', 
+					\ 'synIDattr(synID(line("."), col("."), 0), "name") =~? s:syn_comment' )
+		
+		"Restore the cursor position
+		call setpos(".", curpos)
+
 		let mind = indent(mnum)
 		let mline = getline(mnum)
 
 		call s:Log("Matched found at: " . mnum)
-		if mline =~ s:js_m_multi_end
+
+		if mline =~ s:js_m_multi_end " Fixes multi line invocation
 			call s:Log("MLine matched multi line invocation")
 			return mind - &sw
 		else
@@ -289,21 +293,36 @@ function! GetJsIndent(lnum)
 		endif
 	endif
 
-	if pline =~ '{[^}]*$'
+	if pline =~ '{[^}]*$' && pline !~ '"[^{]*{[^{]*"'
+		call s:Log("Pline matched opening {")
 		return ind + &sw
 	endif
 
 	" Handle: []
 	" ==========
-	if line =~ '^[^\[]*\]'
-		call s:Log("Line matched closing paren")
+	if line =~ '^[^\[]*\]' && !s:IsComment(a:lnum) && line !~ '"[^\]]*\][^\]]*"'
+		call s:Log("Line matched closing ]")
+		
+		" Save the cursor position.
+		let curpos = getpos(".")
 
-		let num = searchpair('\[', '', '\]', 'bW')
-		call s:Log("Matched found at: " . num)
-		return indent(num)
+		" Set the cursor position to the beginning of the line (default
+		" behavior when using ==)
+		call setpos(".", [0, a:lnum, 1, 0])
+
+		" Search for the opening tag
+		let mnum = searchpair('\[', '', '\]', 'bW', 
+					\ 'synIDattr(synID(line("."), col("."), 0), "name") =~? s:syn_comment' )
+		
+		"Restore the cursor position
+		call setpos(".", curpos)
+
+		call s:Log("Matched found at: " . mnum)
+		return indent(mnum)
 	endif
 
-	if pline =~ '\[[^\]]*$'
+	if pline =~ '\[[^\]]*$' && pline !~ '"[^\[]*\[[^\[]*"'
+		call s:Log("Pline matched opening [")
 		return ind + &sw
 	endif
 
