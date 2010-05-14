@@ -8,10 +8,10 @@
 " =================
 
 " Only load one indent script per buffer
-"if exists('b:did_indent')
-  "finish
-"endif
-"let b:did_indent = 1
+if exists('b:did_indent')
+  finish
+endif
+let b:did_indent = 1
 
 " Set the global log variable 1 = logging enabled, 0 = logging disabled
 if !exists("g:js_indent_log")
@@ -33,8 +33,8 @@ let s:js_object_beg = '[{\[]\s*'
 let s:js_object_end = '^[^][{}]*[}\]][;,]\=\s*'
 
 " Simple control blocks (those not beginngin with "{")
-let s:js_s_cntrl_beg = '\(\(\(if\|for\|with\|while\)\s*(.*)\)\|\(try\|do\)\)\s*' 		
-let s:js_s_cntrl_mid = '\(\(\(else\s*if\|catch\)\s*(.*)\)\|\(finally\|else\)\)\s*'
+let s:js_s_cntrl_beg = '^\s*\(\(\(if\|for\|with\|while\)\s*(.*)\)\|\(try\|do\)\)\s*' 		
+let s:js_s_cntrl_mid = '^\s*\(\(\(else\s*if\|catch\)\s*(.*)\)\|\(finally\|else\)\)\s*'
 
 " Multi line control blocks (those beginning with "{")
 let s:js_m_cntrl_beg = s:js_s_cntrl_beg . '\s*{\s*'
