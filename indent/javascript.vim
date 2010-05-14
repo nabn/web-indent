@@ -147,15 +147,6 @@ function! GetJsIndent(lnum)
 	" Determine the current level of indentation
 	let ind = indent(pnum)
 
-	"if(!exists("b:curLine"))
-		"let b:curLine = line(".")
-	"endif
-
-	"if(!exists("b:curCol"))
-		"let b:curCol = col(".")
-	"endif
-	echo col(".")
-
 	"call s:Log(synIDattr(synID(line("."), col("."), 0), 'name'))
 
 
@@ -196,23 +187,23 @@ function! GetJsIndent(lnum)
 		return ind - &sw
 	endif
 
-	"" Handle: Multi-Line Invocation
-	"" =============================
-	"if pline =~ s:js_multi_invok_beg . s:js_line_comment . '$'
-		"call s:Log("PLine matched multi line invoke")
-		"if line =~ s:js_multi_invok_end . s:js_line_comment . '$'
-			"call s:Log("Pline matched multi line invoke end")
-			"return ind
-		"else 
-			"call s:Log("Pline didn't match multi line invoke end")
-			"return ind + &sw
-		"endif 
-	"endif
+	" Handle: Multi-Line Invocation
+	" =============================
+	if pline =~ s:js_multi_invok_beg . s:js_line_comment . '$'
+		call s:Log("PLine matched multi line invoke")
+		if line =~ s:js_multi_invok_end . s:js_line_comment . '$'
+			call s:Log("Pline matched multi line invoke end")
+			return ind
+		else 
+			call s:Log("Pline didn't match multi line invoke end")
+			return ind + &sw
+		endif 
+	endif
 
-	"if line =~ s:js_multi_invok_end . s:js_line_comment . '$'
-		"call s:Log("Pline matched multi invocation end")
-		"return ind - &sw
-	"endif
+	if line =~ s:js_multi_invok_end . s:js_line_comment . '$'
+		call s:Log("Pline matched multi invocation end")
+		return ind - &sw
+	endif
 
 
 	" Handle: Switch Control Blocks
@@ -228,7 +219,7 @@ function! GetJsIndent(lnum)
 			call s:Log("Line matched a cntrl mid")
 			return ind
 		else
-			call s:Log("Line didnt matcha  cntrl mid")
+			call s:Log("Line didnt match a cntrl mid")
 			return ind + &sw
 		endif 
 	endif
@@ -285,10 +276,17 @@ function! GetJsIndent(lnum)
 	if line =~ '^[^{]*}'
 		call s:Log("Line matched closing bracket")
 
-		let num = searchpair('{', '', '}', 'bW')
-		call s:Log("Matched found at: " . num)
-		return indent(num)
+		let mnum = searchpair('{', '', '}', 'bW')
+		let mind = indent(mnum)
+		let mline = getline(mnum)
 
+		call s:Log("Matched found at: " . mnum)
+		if mline =~ s:js_m_multi_end
+			call s:Log("MLine matched multi line invocation")
+			return mind - &sw
+		else
+			return mind
+		endif
 	endif
 
 	if pline =~ '{[^}]*$'
